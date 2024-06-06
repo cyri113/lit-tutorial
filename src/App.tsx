@@ -1,4 +1,5 @@
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import LitProtocol from './LitProtocol'
 
 function App() {
   const account = useAccount()
@@ -38,6 +39,10 @@ function App() {
         ))}
         <div>{status}</div>
         <div>{error?.message}</div>
+      </div>
+
+      <div>
+        <LitProtocol />
       </div>
     </>
   )
