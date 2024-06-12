@@ -5,18 +5,18 @@ import { useAccount } from "wagmi";
 import useLit from "./hooks/LitProvider";
 
 interface IEncrypt {
-  setPayload: any
+  setParsedJsonData: any
   chain: string | undefined
 }
 
-function Encrypt({ setPayload, chain }: IEncrypt) {
+function Encrypt({ setParsedJsonData, chain }: IEncrypt) {
   const { register, handleSubmit } = useForm()
   const { address } = useAccount()
   const { litNodeClient, litConnected } = useLit()
 
   const onSubmit = async (data: any) => {
     console.log(data)
-    await encrypt(data.message)
+    await encrypt(data)
   }
 
   function generateAccessControlConditions(): AccessControlConditions {
@@ -35,7 +35,12 @@ function Encrypt({ setPayload, chain }: IEncrypt) {
     }]
   }
 
-  async function encrypt(dataToEncrypt: string): Promise<void> {
+  async function encrypt(dataToEncrypt: any): Promise<void> {
+
+    if (!chain) {
+      throw new Error("Undefined chain.");
+
+    }
 
     const accessControlConditions = generateAccessControlConditions()
     console.log(accessControlConditions)
@@ -43,14 +48,12 @@ function Encrypt({ setPayload, chain }: IEncrypt) {
     if (litConnected) {
       console.log('Encrypting...')
       try {
-        const encryptResponse = await LitJsSdk.encryptString({
-          dataToEncrypt,
-          accessControlConditions
-        }, litNodeClient)
-        setPayload({
-          encryptResponse,
-          accessControlConditions,
+        const encryptResponse = await LitJsSdk.encryptToJson({
+          string: JSON.stringify(dataToEncrypt),
+          accessControlConditions, litNodeClient, chain,
         })
+        const json = JSON.parse(encryptResponse)
+        setParsedJsonData(json)
       } catch (error) {
         console.error(error)
       }

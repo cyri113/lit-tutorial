@@ -1,22 +1,17 @@
 import * as LitJsSdk from "@lit-protocol/lit-node-client";
-import { EncryptResponse, AccessControlConditions } from "@lit-protocol/types"
+import { EncryptToJsonPayload } from "@lit-protocol/types"
 import { useState } from "react";
 import useLit from "./hooks/LitProvider";
 import useSessionSigs from "./hooks/useSessionSigs";
 import { useEthersSigner } from "./hooks/useEthersSigner";
 import { useAccount } from "wagmi";
 
-interface IPayload {
-  encryptResponse: EncryptResponse
-  accessControlConditions: AccessControlConditions
-}
-
 interface IDecrypt {
-  payload: IPayload | undefined
+  parsedJsonData: EncryptToJsonPayload | undefined
   chain: string | undefined
 }
 
-function Decrypt({ payload, chain }: IDecrypt) {
+function Decrypt({ parsedJsonData, chain }: IDecrypt) {
   const { litNodeClient } = useLit()
   const signer = useEthersSigner()
   const { chainId } = useAccount()
@@ -25,8 +20,8 @@ function Decrypt({ payload, chain }: IDecrypt) {
 
 
   const decrypt = async () => {
-    if (!payload) {
-      throw new Error("Undefined payload");
+    if (!parsedJsonData) {
+      throw new Error("Undefined parsedJsonData");
     }
     if (!sessionSigs) {
       throw new Error("Undefined sessionSigs");
@@ -35,24 +30,17 @@ function Decrypt({ payload, chain }: IDecrypt) {
       throw new Error("Undefined chain");
     }
 
-    const { encryptResponse, accessControlConditions } = payload
-
-    const str = await LitJsSdk.decryptToString({
-      ...encryptResponse, accessControlConditions, sessionSigs, chain
-    }, litNodeClient)
+    const str = await LitJsSdk.decryptFromJson({
+      litNodeClient, parsedJsonData, sessionSigs
+    })
     setDecryptedString(str)
   }
 
   return (
     <>
       <div>
-        <div>encryptResponse:</div>
-        <code>{JSON.stringify(payload?.encryptResponse)}</code>
-      </div>
-
-      <div>
-        <div>accessControlConditions:</div>
-        <code>{JSON.stringify(payload?.accessControlConditions)}</code>
+        <div>parsedJsonData:</div>
+        <code>{JSON.stringify(parsedJsonData)}</code>
       </div>
 
       {signer && chainId ?
@@ -61,7 +49,7 @@ function Decrypt({ payload, chain }: IDecrypt) {
           <code>{JSON.stringify(sessionSigs)}</code>
         </div> : <></>}
 
-      {sessionSigs && payload ?
+      {sessionSigs && parsedJsonData ?
         <div>
           <button onClick={decrypt}>Decrypt</button>
         </div> : <></>}

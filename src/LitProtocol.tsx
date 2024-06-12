@@ -3,12 +3,13 @@ import Decrypt from "./Decrypt"
 import { useEffect, useState } from "react"
 import { chainIdToLitChainName } from "./helpers/Lit"
 import { useAccount } from "wagmi"
+import { EncryptToJsonPayload } from '@lit-protocol/types'
 
 function LitProtocol() {
 
   const { chainId } = useAccount()
   const [chain, setChain] = useState<string>()
-  const [payload, setPayload] = useState()
+  const [parsedJsonData, setParsedJsonData] = useState<EncryptToJsonPayload | undefined>()
 
   useEffect(() => {
     if (chainId) {
@@ -17,19 +18,15 @@ function LitProtocol() {
     }
   }, [chainId])
 
-  useEffect(() => {
-    console.log("payload", payload)
-  }, [payload])
-
   return (
     <>
       <div>
         <h2>Encrypt</h2>
-        <Encrypt setPayload={setPayload} chain={chain} />
+        <Encrypt setParsedJsonData={setParsedJsonData} chain={chain} />
       </div>
       <div>
         <h2>Decrypt</h2>
-        <Decrypt payload={payload} chain={chain} />
+        <Decrypt parsedJsonData={parsedJsonData} chain={chain} />
       </div>
     </>
   )
