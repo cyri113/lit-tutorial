@@ -1,24 +1,35 @@
-import { useEffect, useState } from "react"
 import Encrypt from "./Encrypt"
 import Decrypt from "./Decrypt"
+import { useEffect, useState } from "react"
+import { chainIdToLitChainName } from "./helpers/Lit"
+import { useAccount } from "wagmi"
 
 function LitProtocol() {
-  const [encryptResponse, setEncryptResponse] = useState()
-  const [accessControlConditions, setAccessControlConditions] = useState()
+
+  const { chainId } = useAccount()
+  const [chain, setChain] = useState<string>()
+  const [payload, setPayload] = useState()
 
   useEffect(() => {
-    console.log('encryptResponse', encryptResponse)
-  }, [encryptResponse])
+    if (chainId) {
+      const chainName = chainIdToLitChainName(chainId)
+      setChain(chainName)
+    }
+  }, [chainId])
+
+  useEffect(() => {
+    console.log("payload", payload)
+  }, [payload])
 
   return (
     <>
       <div>
         <h2>Encrypt</h2>
-        <Encrypt setEncryptResponse={setEncryptResponse} setAccessControlConditions={setAccessControlConditions} />
+        <Encrypt setPayload={setPayload} chain={chain} />
       </div>
       <div>
         <h2>Decrypt</h2>
-        <Decrypt encryptResponse={encryptResponse} accessControlConditions={accessControlConditions} />
+        <Decrypt payload={payload} chain={chain} />
       </div>
     </>
   )

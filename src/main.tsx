@@ -8,6 +8,8 @@ import App from './App.tsx'
 import { config } from './wagmi.ts'
 
 import './index.css'
+import { LitProvider } from './hooks/LitProvider.tsx'
+import { LitNetwork } from '@lit-protocol/constants'
 
 globalThis.Buffer = Buffer
 
@@ -15,10 +17,12 @@ const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    </WagmiProvider>
+    <LitProvider litNetwork={LitNetwork.Cayenne}>
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
+      </WagmiProvider>
+    </LitProvider>
   </React.StrictMode>,
 )

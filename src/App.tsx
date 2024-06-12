@@ -41,6 +41,10 @@ function App() {
         <div>{error?.message}</div>
       </div>
 
+      {/* <div>
+        <Auth />
+      </div> */}
+
       <div>
         <LitProtocol />
       </div>
