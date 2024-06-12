@@ -16,7 +16,7 @@ function Decrypt({ parsedJsonData, chain }: IDecrypt) {
   const signer = useEthersSigner()
   const { chainId } = useAccount()
   const { sessionSigs, createSessionSigs } = useSessionSigs()
-  const [decryptedString, setDecryptedString] = useState<string | undefined>()
+  const [decryptedData, setDecryptedData] = useState()
 
 
   const decrypt = async () => {
@@ -30,23 +30,28 @@ function Decrypt({ parsedJsonData, chain }: IDecrypt) {
       throw new Error("Undefined chain");
     }
 
-    const str = await LitJsSdk.decryptFromJson({
-      litNodeClient, parsedJsonData, sessionSigs
-    })
-    setDecryptedString(str)
+    try {
+      console.log('Decrypting...')
+      const str = await LitJsSdk.decryptFromJson({
+        litNodeClient, parsedJsonData, sessionSigs
+      })
+      setDecryptedData(JSON.parse(str))
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
     <>
       <div>
         <div>parsedJsonData:</div>
-        <code>{JSON.stringify(parsedJsonData)}</code>
+        <pre>{JSON.stringify(parsedJsonData, null, 2)}</pre>
       </div>
 
       {signer && chainId ?
         <div>
           <button onClick={() => createSessionSigs({ signer, chainId, litNodeClient })}>Create SessionSigs</button>
-          <code>{JSON.stringify(sessionSigs)}</code>
+          <pre>{JSON.stringify(sessionSigs, null, 2)}</pre>
         </div> : <></>}
 
       {sessionSigs && parsedJsonData ?
@@ -55,8 +60,8 @@ function Decrypt({ parsedJsonData, chain }: IDecrypt) {
         </div> : <></>}
 
       <div>
-        <div>Decrypted message:</div>
-        <code>{decryptedString}</code>
+        <div>Decrypted data:</div>
+        <pre>{JSON.stringify(decryptedData, null, 2)}</pre>
       </div>
     </>
   )
