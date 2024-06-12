@@ -35,6 +35,7 @@ function Decrypt({ parsedJsonData, chain }: IDecrypt) {
       const str = await LitJsSdk.decryptFromJson({
         litNodeClient, parsedJsonData, sessionSigs
       })
+      console.log('Decrypted :)')
       setDecryptedData(JSON.parse(str))
     } catch (error) {
       console.error(error)

@@ -15,7 +15,6 @@ function Encrypt({ setParsedJsonData, chain }: IEncrypt) {
   const { litNodeClient, litConnected } = useLit()
 
   const onSubmit = async (data: any) => {
-    console.log(data)
     await encrypt(data)
   }
 
@@ -39,19 +38,18 @@ function Encrypt({ setParsedJsonData, chain }: IEncrypt) {
 
     if (!chain) {
       throw new Error("Undefined chain.");
-
     }
 
     const accessControlConditions = generateAccessControlConditions()
-    console.log(accessControlConditions)
 
     if (litConnected) {
-      console.log('Encrypting...')
       try {
+        console.log('Encrypting...')
         const encryptResponse = await LitJsSdk.encryptToJson({
           string: JSON.stringify(dataToEncrypt),
           accessControlConditions, litNodeClient, chain,
         })
+        console.log('Encrypted :)')
         const json = JSON.parse(encryptResponse)
         setParsedJsonData(json)
       } catch (error) {
